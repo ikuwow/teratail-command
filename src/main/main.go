@@ -4,6 +4,7 @@ import (
     "os"
     "fmt"
     "net/http"
+    "github.com/m0a/easyjson"
 )
 
 func run() error {
@@ -13,7 +14,16 @@ func run() error {
     }
     defer resp.Body.Close()
 
-    fmt.Println(resp)
+    jsonData, err := easyjson.NewEasyJson(resp.Body)
+    if err != nil {
+        return fmt.Errorf("Invalid responses")
+    }
+
+    fmt.Println(jsonData.K("questions", 0))
+    for k, v:=range jsonData.K("questions").RangeObjects() {
+        fmt.Printf("key: %d, value: %s\n", k, v.K("title"))
+    }
+
     return nil
 }
 
@@ -23,3 +33,4 @@ func main() {
         os.Exit(1)
     }
 }
+
